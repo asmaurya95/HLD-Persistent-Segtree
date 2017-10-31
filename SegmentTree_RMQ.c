@@ -1,48 +1,47 @@
+/* Author : Ashutosh Maurya
+This Program is a part of Minor Project - 1 
+*/
 #include <stdio.h>
+#include <stdbool.h>
 #include <limits.h>
-#include <time.h>
-#define MAX 1000001
-int n,segtree[MAX],arr[MAX];
+#define MAX 100 // Let this be maximum number of nodes in our Binary Tree
+#define max(a,b) ( (a>b)?a:b )
+#define min(a,b) ( (a<b)?a:b )
+
+int euler[2*MAX - 1]; // Euler Tour Array ( DFS Traversal in a Tree )
+bool visited[MAX+1]; // Level of Nodes in Tour Array
+int first[MAX+1];	// To Store the idx of first occuurence of the node in Euler Tour
+int idx,nodes;
+int segtree[2*MAX - 1];
+
+void initialize(){
+	int i;
+	for(i=0;i<=(2*MAX-2);i++){
+		if(i<=MAX)	
+			first[i]=-1,visited[i]=false;
+		euler[i]=0,segtree[i]=0;
+	}
+}
 
 void build(int node,int start,int end){
 	int mid;
 	if(start==end)
-		segtree[node]=arr[start];
+		segtree[node]=euler[start];
 	else {
 		mid=(start+end)/2;
-		build(2*node,start,mid); // left sub tree
-		build(2*node+1,mid+1,end);	// right sub tree
+		build(2*node,start,mid); // left sub Segment tree
+		build(2*node+1,mid+1,end);	// right sub Segment tree
 		int x=segtree[2*node];
 		int y=segtree[2*node+1];
 		segtree[node]=(x>y)?y:x;
 	}
 }
 
-void update(int node,int start,int end,int idx,int val){
-	if(start==end){
-		arr[idx]+=val;
-		segtree[node]+=val;
-		//printf("%d %d\n",node,start);
-	}
-	else{
-		int mid=(start+end)/2;
-		if(start<=idx and idx<=mid){
-			update(2*node,start,mid,idx,val); // left sub tree
-		}
-		else
-			update(2*node+1,mid+1,end,idx,val); // right sub tree
-
-		int x=segtree[2*node];
-		int y=segtree[2*node+1];
-		segtree[node]=((x>y)?x:y); 
-	}
-}
-
 int query (int node,int start,int end, int l, int r){
 	int mid,x,y;
-	if(r<start or end<l)
+	if(r<start || end<l)
 		return INT_MAX;
-	if(l<=start and end<=r)
+	if(l<=start && end<=r)
 		return segtree[node];
 	mid=(start+end)/2;
 	x=query(2*node,start,mid,l,r);
@@ -50,47 +49,54 @@ int query (int node,int start,int end, int l, int r){
 	return ((x>y)?y:x);
 }
 
-int main(){
-	freopen("testcases.in","r",stdin);
-	int testcases,tc;
-	//printf("Enter no. of test cases : ");
-	scanf("%d",&testcases);
-	double rtime[testcases];
-	for (tc=0;tc<testcases;tc++){
-		clock_t t;
-		int i;
-		printf("Enter the no. of Array elements : ");
-		scanf("%d",&n);
-		//printf("Enter %d Integers : ",n);
-		//for(i=0;i<n;i++)
-			//scanf("%d",&arr[i]);
-		build(1,0,n-1);
-		t=clock();
-		//for(i=0;i<5;i++){
-			//int x;
-			//printf("Choose \n1.Update 2.Query\n");
-			//scanf("%d",&x);
-			//if(x==1){
-				//printf("Enter index, value: ");
-				//int idx,val;
-				//scanf("%d%d",&idx,&val);
-		update(1,0,n-1,0,-1);
-			//}
-			//else{
-				//int l,r;
-				//printf("Enter l,r: ");
-				//scanf("%d%d",&l,&r);
-		printf("%d\n",query(1,0,n-1,0,n-1));
-			/*for(int i=1;i<2*n;i++)
-				printf("%d ",segtree[i]);*/
-			//}
-		//}
-		t=clock() - t;
-		double time_taken=((double)t)/CLOCKS_PER_SEC;
-		rtime[tc]=time_taken;
-		//printf("Total Time Taken = %f\n",time_taken);
+void dfs_eulertour(int node,int l){
+	if(node <= nodes){
+		euler[idx]=node;
+		idx++;
+
+		if(visited[node]==false){
+			visited[node]=true;
+			first[node]=idx-1;
+		}
+		// Left SubTree
+		if(2*node <= nodes){
+			dfs_eulertour(2*node,l+1);
+			euler[idx]=node;
+			idx++;
+		}
+		// Right Subtree
+		if((2*node+1) <= nodes ){
+			dfs_eulertour(2*node+1,l+1);
+			euler[idx]=node;
+			idx++;
+		}
 	}
-	for(tc=0;tc<testcases;tc++)
-		printf("Test Case : %d Time : %f \n",tc+1,rtime[tc]);
+}
+
+int findLCA(int u,int v){
+	int i;
+	idx=0;
+	dfs_eulertour(1,0);
+	printf("Euler-Tour Array : ");
+	for(i=0;i<(2*nodes-1);i++){
+		printf("%d ",euler[i]);
+	}
+	printf("\n");
+	build(1,0,2*nodes-2); // Building Segment Tree from Euler Tour
+	return query(1,0,2*nodes-2,min(first[u],first[v]),max(first[v],first[u]));
+}
+
+int main() {
+	int t,u,v;
+	printf("Enter the number of nodes in the Binary Tree : ");
+	scanf("%d",&nodes);
+	printf("Enter the Number of Queries on Binary Tree : ");
+	scanf("%d",&t);
+	while(t--){
+		initialize();
+		printf("Find LCA of two nodes (U,V) : ");
+		scanf("%d%d",&u,&v);
+		printf("%d\n",findLCA(u,v));
+	}
 	return 0;
 }
