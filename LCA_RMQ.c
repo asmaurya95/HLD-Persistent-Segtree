@@ -4,8 +4,7 @@ This Program is a part of Minor Project - 1
 #include <stdio.h>
 #include <stdbool.h>
 #include <limits.h>
-#include <time.h>
-#define MAX 10000 // Let this be maximum number of nodes in our Binary Tree
+#define MAX 100 // Let this be maximum number of nodes in our Binary Tree
 #define max(a,b) ( (a>b)?a:b )
 #define min(a,b) ( (a<b)?a:b )
 
@@ -13,14 +12,14 @@ int euler[2*MAX - 1]; // Euler Tour Array ( DFS Traversal in a Tree )
 bool visited[MAX+1]; // Level of Nodes in Tour Array
 int first[MAX+1];	// To Store the idx of first occuurence of the node in Euler Tour
 int idx,nodes;
-int segtree[2*MAX - 1]; // Segment Tree of Euler Tour Array
+int segtree[2*MAX - 1];
 
 void initialize(){
 	int i;
 	for(i=0;i<=(2*MAX-2);i++){
 		if(i<=MAX)	
 			first[i]=-1,visited[i]=false;
-		euler[i]=0,segtree[i]=INT_MAX;
+		euler[i]=0,segtree[i]=0;
 	}
 }
 
@@ -88,30 +87,16 @@ int findLCA(int u,int v){
 }
 
 int main() {
-	freopen("lca-rmq.in","r",stdin);
-	int tests,tc;
-	printf("Enter the no of tests cases : ");
-	scanf("%d",&tests);
-	double rtime[tests];
-	for(tc=0;tc<tests;tc++){
-		clock_t time;
-		time=clock();
-		int t,u,v;
-		//printf("Enter the number of nodes in the Binary Tree : ");
-		scanf("%d",&nodes);
-		//printf("Enter the Number of Queries on Binary Tree : ");
-		scanf("%d",&t);
-		while(t--){
-			initialize();
-			//printf("Find LCA of two nodes (U,V) : ");
-			scanf("%d%d",&u,&v);
-			printf("Lowest Common Ancestor is %d\n",findLCA(u,v));
-		}
-		time=clock()-time;
-		double time_taken=((double)time)/CLOCKS_PER_SEC;
-		rtime[tc]=time_taken;
+	int t,u,v;
+	printf("Enter the number of nodes in the Binary Tree : ");
+	scanf("%d",&nodes);
+	printf("Enter the Number of Queries on Binary Tree : ");
+	scanf("%d",&t);
+	while(t--){
+		initialize();
+		printf("Find LCA of two nodes (U,V) : ");
+		scanf("%d%d",&u,&v);
+		printf("%d\n",findLCA(u,v));
 	}
-	for(tc=0;tc<tests;tc++)
-		printf("Test Case : %d Time : %f \n",tc+1,rtime[tc]);
 	return 0;
 }
