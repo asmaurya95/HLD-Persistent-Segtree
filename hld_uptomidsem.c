@@ -120,7 +120,7 @@ void readInput(int *n)
 void processQueries(int n,int chain_heads[])
 {
     int Q;
-    printf("Query Options: \nM X Y : Maximum of all Edge Weights between nodes X,Y\nC E VAL: Change Value of Edge E to VAL\nR X: Roll Back to the state after Xth Query ( currently not supported )\n");
+    printf("Query Options: \n1 X Y : Maximum of all Edge Weights between nodes X,Y\n2 E VAL: Change Value of Edge E to VAL\n3 X: Roll Back to the state after Xth Query ( currently not supported )\n");
     printf("Enter Number of Queries: ");
     scanf("%d",&Q);
     while(Q--)
